@@ -65,6 +65,15 @@ class editor:
         
     def set_matriz(self, i, j):
         self.matriz[i][j] = self.get_color()
+        
+    def actualiza_lienzo(self):
+        cont = 1
+        for fila in self.matriz:
+            for j in fila:
+                self.actualiza_color(j)
+                self.lienzo.itemconfig(f"pixel{cont}", fill = self.get_colorfill())
+                cont += 1
+        self.actualiza_color(self.get_color())
 
     def mostrar_interfaz(self):
         for fila in self.matriz:
@@ -128,6 +137,28 @@ class editor:
         elif fill_color == "white":
             self.set_color(0)
             self.set_colorfill(fill_color)
+            
+    def actualiza_color(self, num):
+        if num == 0:
+            self.set_colorfill("white")
+        elif num == 1:
+            self.set_colorfill("pink")
+        elif num == 2:
+            self.set_colorfill("yellow")
+        elif num == 3:
+            self.set_colorfill("orange")
+        elif num == 4:
+            self.set_colorfill("green")
+        elif num == 5:
+            self.set_colorfill("red")
+        elif num == 6:
+            self.set_colorfill("blue")
+        elif num == 7:
+            self.set_colorfill("purple")
+        elif num == 8:
+            self.set_colorfill("brown")
+        elif num == 9:
+            self.set_colorfill("black")
         
     def on_canvas_click(self,event):
         self.cuadros_cambiados.clear()
@@ -160,83 +191,3 @@ class editor:
 
 objeto = editor()
 objeto.mostrar_interfaz()
-
-
-
-
-
-def png_to_matrix(image_path):
-    # Open the image
-    image = Image.open(image_path)
-    
-    # Convert the image to RGB (if it's not already in that mode)
-    image = image.convert('RGB')
-    
-    # Get the dimensions of the image
-    width, height = image.size
-    
-    # Create an empty matrix to store pixel values
-    pixel_matrix = []
-    
-    # Iterate through each pixel in the image
-    for y in range(height):
-        row = []
-        for x in range(width):
-            # Get the RGB values of the pixel
-            r, g, b = image.getpixel((x, y))
-            
-            # Convert RGB to a single value (e.g., grayscale)
-            pixel_value = (r << 16) + (g << 8) + b  # Combining RGB values into a single integer
-            
-            # Append the pixel value to the row
-            row.append(pixel_value)
-        # Append the row to the matrix
-        pixel_matrix.append(row)
-    
-    return pixel_matrix
-
-
-
-def abrir_json():
-    filename = filedialog.askopenfilename(filetypes=[("Archivo JSON", "*.json")])
-    if filename:
-        try:
-            with open(filename, 'r') as file:
-                data = json.load(file)
-                dueno = data.get('dueno')
-                estado = data.get('estado')
-                matriz = data.get('matriz')
-                print("Dueño:", dueno)
-                print("Estado:", estado)
-                print("Matriz:", matriz)
-                # Puedes usar las variables 'dueno', 'estado' y 'matriz' según sea necesario
-        except Exception as e:
-            print("Error al abrir el archivo:", e)
-
-
-def guardar_json(dueno, estado, matriz):
-    filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("Archivo JSON", "*.json")])
-    if filename:
-        data = {
-            'dueno': dueno,
-            'estado': estado,
-            'matriz': matriz
-        }
-        try:
-            with open(filename, 'w') as file:
-                json.dump(data, file, indent=4)
-                print("Archivo JSON guardado correctamente:", filename)
-        except Exception as e:
-            print("Error al guardar el archivo JSON:", e)
-
-root = tk.Tk()
-root.title("Guardar Archivo JSON")
-
-dueno = "Luis"
-estado = "terminado"
-matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]  # Por ejemplo, tu matriz aquí
-
-button = tk.Button(root, text="Guardar JSON", command=lambda: guardar_json(dueno, estado, matriz))
-button.pack(pady=20)
-
-root.mainloop()
