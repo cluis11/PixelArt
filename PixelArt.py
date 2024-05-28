@@ -74,6 +74,88 @@ class editor:
                 self.lienzo.itemconfig(f"pixel{cont}", fill = self.get_colorfill())
                 cont += 1
         self.actualiza_color(self.get_color())
+    
+    def reflejo_horizontal(self):
+        nueva_matriz = []
+        n = len(self.matriz[0])-1 #Tamaño de matriz (n+1)x(n+1)
+        for fila in range (n+1):
+            nueva_matriz.append([]) #Crea n filas de la nueva matriz
+        
+        for columna in range(n+1): #repite el ciclo por cada fila
+            fila = 0
+            original = n #fila original
+            for i in range (n+1): 
+                nueva_matriz[fila].append(self.matriz[original][columna])
+                original = original - 1
+                fila = fila + 1
+        self.matriz = nueva_matriz
+        self.actualiza_lienzo()
+        
+    def reflejo_vertical(self):
+        nueva_matriz = []
+        n = len(self.matriz[0]) - 1  # Tamaño de matriz (n+1)x(n+1)
+        for fila in range(n + 1):  # Crea (n+1) filas de la nueva matriz
+            nueva_matriz.append([])
+
+        for fila in range(n + 1):  # repite el ciclo por cada fila
+            original = n
+            for _ in range(n + 1):
+                nueva_matriz[fila].append(self.matriz[fila][original])
+                original -= 1
+        self.matriz = nueva_matriz
+        self.actualiza_lienzo()
+    
+    def rotar_derecha(self):
+        nueva_matriz = []
+        n = len(self.matriz[0])-1 #Tamaño de matriz (n+1)x(n+1)
+        for fila in range (n+1):
+            nueva_matriz.append([]) #Crea n filas de la nueva matriz
+        for fila in nueva_matriz:
+            for columna in range (n+1):
+                fila.append('')
+    
+        columna_nueva_matriz = n
+        for fila in self.matriz:
+            
+            fila_nueva_matriz = 0
+            
+            for elemento in fila:
+                nueva_matriz[fila_nueva_matriz][columna_nueva_matriz] = elemento
+                fila_nueva_matriz += 1
+            columna_nueva_matriz -= 1
+        self.matriz = nueva_matriz
+        self.actualiza_lienzo()
+    
+    def rotar_izquierda(self):
+        nueva_matriz = []
+        n = len(self.matriz[0])-1 #Tamaño de matriz (n+1)x(n+1)
+        for fila in range (n+1):
+            nueva_matriz.append([]) #Crea n filas de la nueva matriz
+        for fila in nueva_matriz:
+            for columna in range (n+1):
+                fila.append('')
+    
+        columna_nueva_matriz = 0
+        for fila in self.matriz:
+            
+            fila_nueva_matriz = n
+            
+            for elemento in fila:
+                nueva_matriz[fila_nueva_matriz][columna_nueva_matriz] = elemento
+                fila_nueva_matriz -= 1
+            columna_nueva_matriz += 1
+        self.matriz = nueva_matriz
+        self.actualiza_lienzo()
+
+    def clear_matriz(self):
+        cleared_matriz = []
+        n = (len(self.matriz))
+        for i in range (n):
+            cleared_matriz.append([])
+            for j in range(n):
+                cleared_matriz[i].append(0)
+        self.matriz = cleared_matriz
+        self.actualiza_lienzo()
 
     def mostrar_interfaz(self):
         for fila in self.matriz:
@@ -83,6 +165,7 @@ class editor:
                 self.x += self.SIZE + 1
             self.x = 0
             self.y+= self.SIZE + 1
+
             
         self.pantalla.create_oval(620, 100, 620+50, 100+50, fill="white", tag="color")
         self.pantalla.create_oval(680, 100, 680+50, 100+50, fill="black", tag="color")
@@ -101,6 +184,21 @@ class editor:
         self.lienzo.place(x=400,y=300, anchor="center")
         self.lienzo.bind("<Button-1>", self.on_canvas_click)
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+
+        vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil", activebackground="lightgray")
+        vertical.place(x=5, y=100)
+
+        hoizontal = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
+        hoizontal.place(x=5, y=175)
+
+        derecha = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Right', command = self.rotar_derecha, relief="ridge", font = "Stencil", activebackground="lightgray")
+        derecha.place(x=5, y=250)
+
+        izquierda = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Left', command = self.rotar_izquierda, relief="ridge", font = "Stencil", activebackground="lightgray")
+        izquierda.place(x=5, y=325)
+
+        clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
+        clear_all.place(x=5, y=400)
         
         self.window.mainloop()
         
