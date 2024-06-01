@@ -30,7 +30,7 @@ class editor:
         self.estado = "Creado"
         self.color = 9
         self.color_fill = "black"
-        self.SIZE = 20
+        self.SIZE = 133.3333333
         self.x = 0
         self.y = 0
         self.cont = 1
@@ -38,13 +38,14 @@ class editor:
         
         self.window = Tk()
         self.pantalla = Canvas(self.window,width=800, height=600)
-        self.lienzo = Canvas(self.pantalla,width=430, height=430)
+        self.lienzo = Canvas(self.pantalla,width=133.3333333*3, height=133.3333333*3)
         self.lienzo.start_x = None
         self.lienzo.start_y = None
         self.lienzo.end_x = None
         self.lienzo.end_y = None
         self.lienzo.zoom = None
         self.isZoom = False
+        self.isNum = False
 
     def get_creador(self):
         return self.creador
@@ -60,6 +61,12 @@ class editor:
     
     def get_matriz(self):
         return self.matriz
+    
+    def get_isNum(self):
+        return self.isNum
+    
+    def get_isZoom(self):
+        return self.isZoom
     
     def set_creador(self, creador):
         self.creador = creador
@@ -78,6 +85,18 @@ class editor:
         
     def set_matriz_pos(self, i, j):
         self.matriz[i][j] = self.get_color()
+        
+    def set_isZoom(self):
+        if self.isZoom():
+            self.isZoom = False
+        else:
+            self.isZoom = True
+            
+    def set_isNum(self):
+        if self.isNum():
+            self.isNum = False
+        else:
+            self.isNum = True
         
     def actualiza_lienzo(self):
         cont = 1
@@ -193,16 +212,18 @@ class editor:
         self.matriz = nueva_matriz
         self.actualiza_lienzo()
    
-
-    def mostrar_interfaz(self):
-        for fila in self.matriz:
+    def dibujar_lienzo(self,matriz):
+        for fila in matriz:
             for columna in fila:
                 self.lienzo.create_rectangle(self.x, self.y, self.x + self.SIZE, self.y + self.SIZE, fill = "white", tag = f"pixel{self.cont}")
-                self.lienzo.create_text(self.x + (self.SIZE/2), self.y + (self.SIZE/2), text="", fill="black", anchor="center", tag= f"cuadro{self.cont}")
+                self.lienzo.create_text(self.x + (self.SIZE/2), self.y + (self.SIZE/2), text="**", fill="black", anchor="center", tag= f"cuadro{self.cont}")
                 self.cont+=1
                 self.x += self.SIZE + 1
             self.x = 0
             self.y+= self.SIZE + 1
+
+    def mostrar_interfaz(self):
+        self.dibujar_lienzo(self.get_matriz())
             
         self.pantalla.create_oval(620, 100, 620+50, 100+50, fill="white", tag="color")
         self.pantalla.create_oval(680, 100, 680+50, 100+50, fill="black", tag="color")
@@ -309,6 +330,11 @@ class editor:
             self.set_colorfill("brown")
         elif num == 9:
             self.set_colorfill("black")
+            
+    def mostrar_matriz_num(self):
+        if self.isNum:
+            pass
+            
             
         
     def on_canvas_click(self,event):
