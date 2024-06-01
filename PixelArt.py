@@ -39,7 +39,12 @@ class editor:
         self.window = Tk()
         self.pantalla = Canvas(self.window,width=800, height=600)
         self.lienzo = Canvas(self.pantalla,width=430, height=430)
-
+        self.lienzo.start_x = None
+        self.lienzo.start_y = None
+        self.lienzo.end_x = None
+        self.lienzo.end_y = None
+        self.lienzo.zoom = None
+        self.isZoom = False
 
     def get_creador(self):
         return self.creador
@@ -232,8 +237,8 @@ class editor:
         clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
         clear_all.place(x=5, y=400)
 
-        clear_all = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
-        clear_all.place(x=175, y=525)
+        contraste = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
+        contraste.place(x=175, y=525)
         
         negativo = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
         negativo.place(x=620, y=425)
@@ -243,6 +248,9 @@ class editor:
         
         guardar_img = Button(self.pantalla, width = 10, height = 2, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
         guardar_img.place(x=300, y=15)
+        
+        zoom = Button(self.pantalla, width = 10, height = 2, text = 'Zoom', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
+        zoom.place(x=30, y=15)
         
         self.window.mainloop()
         
@@ -330,6 +338,35 @@ class editor:
                 print(x, y)
                 print (j, i)
                 self.matriz[i][j] = self.get_color()
+                
+    def zoom(self):
+        if self.isZoom:
+            self.zoom = False
+            self.lienzo.bind("<Button-1>", self.on_canvas_click)
+            self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+            self.lienzo.unbind("<ButtonRelease-1>")
+        else:
+            self.zoom = True
+            self.lienzo.bind("<Button-1>", self.inicio_zoom)
+            self.lienzo.bind("<B1-Motion>", self.select_zoom)
+            self.lienzo.bind("<ButtonRelease-1>", self.fin_zoom)
+                
+    def inicio_zoom(self, event):
+        self.lienzo.start_x = event.x
+        self.lienzo.start_y = event.y
+        
+    def select_zoom(self, event):
+        if self.lienzo.zoom:
+            self.lienzo.delete(self.lienzo.zoom)
+        x0, y0 = (self.lienzo.start_x, self.lienzo.start_y)
+        x1, y1 = (event.x, event.y)
+        self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
+        
+    def fin_zoom(self, event):
+        self.lienzo.end_x = event.x
+        self.lienzo.end_y = event.y 
+        self.lienzo.delete(self.lienzo.zoom)
+        self.lienzo.zoom = None
 
     def abrir_json(self):
         filename = filedialog.askopenfilename(filetypes=[("Archivo JSON", "*.json")])
