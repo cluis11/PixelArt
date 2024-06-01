@@ -171,7 +171,23 @@ class editor:
         for i in range (n):
             for j in range(n):
                 self.matriz[i][j] = valores_negativos[self.matriz[i][j]]
-        self.actualiza_lienzo()   
+        self.actualiza_lienzo()  
+    
+    def alto_contraste(self):
+        nueva_matriz = self.matriz
+        index_fila = 0
+        for fila in self.matriz:
+            index_columna = 0
+            for elemento in fila:
+                if elemento <= 4:
+                    nueva_matriz [index_fila][index_columna] = 0
+                else: 
+                    nueva_matriz[index_fila][index_columna] = 9
+                index_columna += 1
+            index_fila += 1
+        self.matriz = nueva_matriz
+        self.actualiza_lienzo()
+   
 
     def mostrar_interfaz(self):
         for fila in self.matriz:
@@ -215,6 +231,9 @@ class editor:
 
         clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
         clear_all.place(x=5, y=400)
+
+        clear_all = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
+        clear_all.place(x=175, y=525)
         
         negativo = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
         negativo.place(x=620, y=425)
