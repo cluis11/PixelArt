@@ -1,4 +1,6 @@
 from tkinter import *
+from tkinter import filedialog
+import json
 
 class editor:
     def __init__(self):
@@ -24,7 +26,7 @@ class editor:
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                     ]
-        self.creador = ""
+        self.creador = "luis"
         self.estado = "Creado"
         self.color = 9
         self.color_fill = "black"
@@ -51,6 +53,9 @@ class editor:
     def get_estado(self):
         return self.estado
     
+    def get_matriz(self):
+        return self.matriz
+    
     def set_creador(self, creador):
         self.creador = creador
     
@@ -63,7 +68,10 @@ class editor:
     def set_estado(self, estado):
         self.estado = estado
         
-    def set_matriz(self, i, j):
+    def set_matriz(self, matriz):
+        self.matriz = matriz
+        
+    def set_matriz_pos(self, i, j):
         self.matriz[i][j] = self.get_color()
         
     def actualiza_lienzo(self):
@@ -156,16 +164,24 @@ class editor:
                 cleared_matriz[i].append(0)
         self.matriz = cleared_matriz
         self.actualiza_lienzo()
+        
+    def negativo(self):
+        valores_negativos = [9,8,7,6,5,4,3,2,1,0]
+        n = (len(self.matriz))
+        for i in range (n):
+            for j in range(n):
+                self.matriz[i][j] = valores_negativos[self.matriz[i][j]]
+        self.actualiza_lienzo()   
 
     def mostrar_interfaz(self):
         for fila in self.matriz:
             for columna in fila:
                 self.lienzo.create_rectangle(self.x, self.y, self.x + self.SIZE, self.y + self.SIZE, fill = "white", tag = f"pixel{self.cont}")
+                self.lienzo.create_text(self.x + (self.SIZE/2), self.y + (self.SIZE/2), text="", fill="black", anchor="center", tag= f"cuadro{self.cont}")
                 self.cont+=1
                 self.x += self.SIZE + 1
             self.x = 0
             self.y+= self.SIZE + 1
-
             
         self.pantalla.create_oval(620, 100, 620+50, 100+50, fill="white", tag="color")
         self.pantalla.create_oval(680, 100, 680+50, 100+50, fill="black", tag="color")
@@ -199,6 +215,15 @@ class editor:
 
         clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
         clear_all.place(x=5, y=400)
+        
+        negativo = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
+        negativo.place(x=620, y=425)
+        
+        abrir_img = Button(self.pantalla, width = 10, height = 2, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
+        abrir_img.place(x=180, y=15)
+        
+        guardar_img = Button(self.pantalla, width = 10, height = 2, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
+        guardar_img.place(x=300, y=15)
         
         self.window.mainloop()
         
@@ -257,6 +282,7 @@ class editor:
             self.set_colorfill("brown")
         elif num == 9:
             self.set_colorfill("black")
+            
         
     def on_canvas_click(self,event):
         self.cuadros_cambiados.clear()
@@ -270,7 +296,7 @@ class editor:
             print("\n")
             print(x, y)
             print (j, i)
-            self.set_matriz(i,j)            
+            self.set_matriz_pos(i,j)            
 
     def on_canvas_motion(self,event):
         x, y = event.x, event.y
@@ -286,6 +312,33 @@ class editor:
                 print (j, i)
                 self.matriz[i][j] = self.get_color()
 
+    def abrir_json(self):
+        filename = filedialog.askopenfilename(filetypes=[("Archivo JSON", "*.json")])
+        if filename:
+            try:
+                with open(filename, 'r') as file:
+                    data = json.load(file)
+                    self.set_creador(data.get('dueno'))
+                    self.set_estado(data.get('estado'))
+                    self.set_matriz(data.get('matriz'))
+                    self.actualiza_lienzo()
+            except Exception as e:
+                print("Error al abrir el archivo:", e)
+                
+    def guardar_json(self):
+        filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("Archivo JSON", "*.json")])
+        if filename:
+            data = {
+                'dueno': self.get_creador(),
+                'estado': self.get_estado(),
+                'matriz': self.get_matriz()
+            }
+            try:
+                with open(filename, 'w') as file:
+                    json.dump(data, file, indent=4)
+                    print("Archivo JSON guardado correctamente:", filename)
+            except Exception as e:
+                print("Error al guardar el archivo JSON:", e)
 
 objeto = editor()
 objeto.mostrar_interfaz()
