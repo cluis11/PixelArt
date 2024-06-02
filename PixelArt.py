@@ -30,7 +30,7 @@ class editor:
         self.estado = "Creado"
         self.color = 9
         self.color_fill = "black"
-        self.SIZE = 133.3333333
+        self.SIZE = 19
         self.x = 0
         self.y = 0
         self.cont = 1
@@ -38,7 +38,7 @@ class editor:
         
         self.window = Tk()
         self.pantalla = Canvas(self.window,width=800, height=600)
-        self.lienzo = Canvas(self.pantalla,width=133.3333333*3, height=133.3333333*3)
+        self.lienzo = Canvas(self.pantalla,width=400, height=400)
         self.lienzo.start_x = None
         self.lienzo.start_y = None
         self.lienzo.end_x = None
@@ -46,9 +46,12 @@ class editor:
         self.lienzo.zoom = None
         self.isZoom = False
         self.isNum = False
+        self.matriz_zoomed = None
+        self.zoomed_SIZE = None
 
     def get_creador(self):
         return self.creador
+    
     
     def get_color(self):
         return self.color
@@ -67,6 +70,9 @@ class editor:
     
     def get_isZoom(self):
         return self.isZoom
+
+    def get_matriz_zoomed(self):
+        return self.matriz_zoomed
     
     def set_creador(self, creador):
         self.creador = creador
@@ -216,7 +222,7 @@ class editor:
         for fila in matriz:
             for columna in fila:
                 self.lienzo.create_rectangle(self.x, self.y, self.x + self.SIZE, self.y + self.SIZE, fill = "white", tag = f"pixel{self.cont}")
-                self.lienzo.create_text(self.x + (self.SIZE/2), self.y + (self.SIZE/2), text="**", fill="black", anchor="center", tag= f"cuadro{self.cont}")
+                self.lienzo.create_text(self.x + (self.SIZE/2), self.y + (self.SIZE/2), text="", fill="black", anchor="center", tag= f"cuadro{self.cont}")
                 self.cont+=1
                 self.x += self.SIZE + 1
             self.x = 0
@@ -270,8 +276,8 @@ class editor:
         guardar_img = Button(self.pantalla, width = 10, height = 2, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
         guardar_img.place(x=300, y=15)
         
-        zoom = Button(self.pantalla, width = 10, height = 2, text = 'Zoom', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
-        zoom.place(x=30, y=15)
+        self.zoom_button = Button(self.pantalla, width = 10, height = 2, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.zoom_button.place(x=30, y=15)
         
         self.window.mainloop()
         
@@ -334,6 +340,70 @@ class editor:
     def mostrar_matriz_num(self):
         if self.isNum:
             pass
+
+    def hide_matriz(self):
+        for i in range(self.cont):
+            self.lienzo.itemconfig(f"pixel{i}", state='hidden')
+            self.lienzo.itemconfig(f"cuadro{i}", state='hidden')
+    
+    def mostrar_matriz(self):
+        for i in range(self.cont):
+            self.lienzo.itemconfig(f"pixel{i}", state='normal')
+            self.lienzo.itemconfig(f"cuadro{i}", state='normal')
+
+    def mostrar_matriz_zoomed(self):
+        self.hide_matriz()
+        self.y = 0
+        self.x = 0
+        n = abs((self.lienzo.start_x // (self.SIZE + 1)) - (self.lienzo.end_x // (self.SIZE + 1))) + 2
+        m = abs((self.lienzo.start_y // (self.SIZE + 1)) - (self.lienzo.end_y // (self.SIZE + 1))) + 2
+        print("matriz{}x{}".format(n,m))
+        if n >= m:
+            self.zoomed_SIZE = 430 // n
+        else:
+            self.zoomed_SIZE = 430 // m
+
+        if self.isZoom:
+
+            for fila in self.matriz_zoomed:
+                for num in fila:
+                    if num == 0:
+                        color = ("white")
+                    elif num == 1:
+                        color =("pink")
+                    elif num == 2:
+                        color =("yellow")
+                    elif num == 3:
+                        color =("orange")
+                    elif num == 4:
+                        color =("green")
+                    elif num == 5:
+                        color =("red")
+                    elif num == 6:
+                        color =("blue")
+                    elif num == 7:
+                        color =("purple")
+                    elif num == 8:
+                        color =("brown")
+                    elif num == 9:
+                        color =("black")
+                    self.lienzo.create_rectangle(self.x, self.y, self.x + self.zoomed_SIZE, self.y + self.zoomed_SIZE, fill = color , tag = f"zoomed_pixel{self.cont}")
+                    self.cont+=1
+                    self.x += self.zoomed_SIZE + 1
+                self.x = 0
+                self.y+= self.zoomed_SIZE + 1
+
+    def zoom_out(self):
+        self.y = 0
+        self.x = 0
+        for i in range(self.cont):
+            self.lienzo.delete(f"zoomed_pixel{i}")
+        self.mostrar_matriz()
+        self.isZoom = False
+        self.zoom_button.config(text='Zoom In')
+        
+        
+
             
             
         
@@ -371,13 +441,16 @@ class editor:
             self.lienzo.bind("<Button-1>", self.on_canvas_click)
             self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
             self.lienzo.unbind("<ButtonRelease-1>")
+            self.zoom_out()
         else:
             self.zoom = True
             self.lienzo.bind("<Button-1>", self.inicio_zoom)
             self.lienzo.bind("<B1-Motion>", self.select_zoom)
             self.lienzo.bind("<ButtonRelease-1>", self.fin_zoom)
-                
+            
+
     def inicio_zoom(self, event):
+        self.matriz_zoomed = None
         self.lienzo.start_x = event.x
         self.lienzo.start_y = event.y
         
@@ -387,12 +460,89 @@ class editor:
         x0, y0 = (self.lienzo.start_x, self.lienzo.start_y)
         x1, y1 = (event.x, event.y)
         self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
+        print(x0// (self.SIZE + 1) ,y0// (self.SIZE + 1) ,x1// (self.SIZE + 1) ,y1// (self.SIZE + 1))
         
     def fin_zoom(self, event):
         self.lienzo.end_x = event.x
         self.lienzo.end_y = event.y 
         self.lienzo.delete(self.lienzo.zoom)
         self.lienzo.zoom = None
+        self.zoom_button.config(text='Zoom Out')
+        self.zoom_in()
+        
+    
+    def zoom_in(self): #inicial donde se hace click y final donde se suelta
+        fila_inicial = self.lienzo.start_y // (self.SIZE + 1)
+        fila_final = self.lienzo.end_y // (self.SIZE + 1)
+        columna_inicial = self.lienzo.start_x // (self.SIZE + 1)
+        columna_final = self.lienzo.end_x // (self.SIZE + 1)
+
+
+        matriz = self.matriz
+
+        filas_nueva_matriz = abs(fila_inicial-fila_final) + 1
+        columnas_nueva_matriz = abs(columna_inicial - columna_final) + 1
+
+        print('size nueva matriz es {}x{}'.format(filas_nueva_matriz,columnas_nueva_matriz))
+        
+        nueva_matriz = []
+
+        if fila_inicial < fila_final and columna_inicial < columna_final: #EL PUNTO INICIAL ES LA ESQUINA SUP IZQ
+            
+            index_fila = fila_inicial
+            for fila in range (filas_nueva_matriz):
+                nueva_matriz.append([])
+                index_columna = columna_inicial
+                for columna in range (columnas_nueva_matriz):
+                    nueva_matriz[fila].append(matriz[index_fila][index_columna])
+                    index_columna += 1
+                index_fila += 1
+        elif fila_inicial < fila_final and columna_inicial > columna_final: #EL PUNTO INICIAL ES LA ESQUINA SUP DER
+
+            index_fila = fila_inicial
+            for fila in range (filas_nueva_matriz):
+                nueva_matriz.append([])
+                index_columna = columna_final
+                for columna in range (columnas_nueva_matriz):
+                    nueva_matriz[fila].append(matriz[index_fila][index_columna])
+                    index_columna += 1
+                index_fila += 1
+        
+        elif fila_inicial > fila_final and columna_inicial < columna_final: #EL PUNTO INICIAL ES LA ESQUINA INF IZQ
+
+            index_fila = fila_final
+            for fila in range (filas_nueva_matriz):
+                nueva_matriz.append([])
+                index_columna = columna_inicial
+                for columna in range (columnas_nueva_matriz):
+                    nueva_matriz[fila].append(matriz[index_fila][index_columna])
+                    index_columna += 1
+                index_fila += 1
+        
+        elif fila_inicial > fila_final and columna_inicial > columna_final: #EL PUNTO INICIAL ES LA ESQUINA INF DER
+
+            index_fila = fila_final
+            for fila in range (filas_nueva_matriz):
+                nueva_matriz.append([])
+                index_columna = columna_final
+                for columna in range (columnas_nueva_matriz):
+                    nueva_matriz[fila].append(matriz[index_fila][index_columna])
+                    index_columna += 1
+                index_fila += 1
+
+        self.matriz_zoomed = nueva_matriz
+        self.isZoom = True
+        self.mostrar_matriz_zoomed()
+        
+        print("MATRIZ CLEARED:")
+        print()
+        for fila in self.matriz_zoomed:
+            for columna in fila:
+                print(' {} '.format(columna),end='')
+            print()
+    
+
+                
 
     def abrir_json(self):
         filename = filedialog.askopenfilename(filetypes=[("Archivo JSON", "*.json")])
