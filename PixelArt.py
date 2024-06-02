@@ -523,6 +523,23 @@ class editor:
         columna_inicial = self.lienzo.start_x // (self.SIZE)
         columna_final = self.lienzo.end_x // (self.SIZE)
 
+        if fila_inicial > 19:
+            fila_inicial = 19
+        if fila_final > 19:
+            fila_final = 19
+        if columna_inicial > 19:
+            columna_inicial = 19
+        if columna_final > 19:
+            columna_final = 19
+
+        if fila_inicial < 0:
+            fila_inicial = 0
+        if fila_final < 0:
+            fila_final = 0
+        if columna_inicial < 0:
+            columna_inicial = 0
+        if columna_final < 0:
+            columna_final = 0
 
         matriz = self.matriz
 
