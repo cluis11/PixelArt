@@ -30,7 +30,7 @@ class editor:
         self.estado = "Creado"
         self.color = 9
         self.color_fill = "black"
-        self.SIZE = 19
+        self.SIZE = 20
         self.x = 0
         self.y = 0
         self.cont = 1
@@ -38,7 +38,7 @@ class editor:
         
         self.window = Tk()
         self.pantalla = Canvas(self.window,width=800, height=600)
-        self.lienzo = Canvas(self.pantalla,width=400, height=400)
+        self.lienzo = Canvas(self.pantalla,width=430, height=430)
         self.lienzo.start_x = None
         self.lienzo.start_y = None
         self.lienzo.end_x = None
@@ -250,37 +250,59 @@ class editor:
         self.lienzo.bind("<Button-1>", self.on_canvas_click)
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
 
-        vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil", activebackground="lightgray")
-        vertical.place(x=5, y=100)
+        self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.vertical.place(x=5, y=100)
 
-        hoizontal = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
-        hoizontal.place(x=5, y=175)
+        self.horizontal = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.horizontal.place(x=5, y=175)
 
-        derecha = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Right', command = self.rotar_derecha, relief="ridge", font = "Stencil", activebackground="lightgray")
-        derecha.place(x=5, y=250)
+        self.derecha = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Right', command = self.rotar_derecha, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.derecha.place(x=5, y=250)
 
-        izquierda = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Left', command = self.rotar_izquierda, relief="ridge", font = "Stencil", activebackground="lightgray")
-        izquierda.place(x=5, y=325)
+        self.izquierda = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Left', command = self.rotar_izquierda, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.izquierda.place(x=5, y=325)
 
-        clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
-        clear_all.place(x=5, y=400)
+        self.clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.clear_all.place(x=5, y=400)
 
-        contraste = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
-        contraste.place(x=175, y=525)
+        self.contraste = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.contraste.place(x=175, y=525)
         
-        negativo = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
-        negativo.place(x=620, y=425)
+        self.negate = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.negate.place(x=620, y=425)
         
-        abrir_img = Button(self.pantalla, width = 10, height = 2, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
-        abrir_img.place(x=180, y=15)
+        self.abrir_img = Button(self.pantalla, width = 10, height = 2, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.abrir_img.place(x=180, y=15)
         
-        guardar_img = Button(self.pantalla, width = 10, height = 2, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
-        guardar_img.place(x=300, y=15)
+        self.guardar_img = Button(self.pantalla, width = 10, height = 2, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.guardar_img.place(x=300, y=15)
         
         self.zoom_button = Button(self.pantalla, width = 10, height = 2, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.zoom_button.place(x=30, y=15)
         
         self.window.mainloop()
+    
+    def ocultar_botones(self):
+        self.vertical.place_forget()
+        self.horizontal.place_forget()
+        self.derecha.place_forget()
+        self.izquierda.place_forget()
+        self.clear_all.place_forget()
+        self.contraste.place_forget()
+        self.negate.place_forget()
+        self.abrir_img.place_forget()
+        self.guardar_img.place_forget()
+    
+    def mostrar_botones(self):
+        self.vertical.place(x=5, y=100)
+        self.horizontal.place(x=5, y=175)
+        self.derecha.place(x=5, y=250)
+        self.izquierda.place(x=5, y=325)
+        self.clear_all.place(x=5, y=400)
+        self.contraste.place(x=175, y=525)
+        self.negate.place(x=620, y=425)
+        self.abrir_img.place(x=180, y=15)
+        self.guardar_img.place(x=300, y=15)
         
     def asignar_color(self, event):
         color_id = event.widget.find_withtag(CURRENT)[0]
@@ -354,26 +376,27 @@ class editor:
 
     def mostrar_matriz_zoomed(self):
         self.hide_matriz()
+        self.ocultar_botones()
 
         for i in range(self.cont):
             self.lienzo.delete(f"zoomed_pixel{i}")
 
 
-        n = abs((self.lienzo.start_x // (self.SIZE + 1)) - (self.lienzo.end_x // (self.SIZE + 1))) + 1
-        m = abs((self.lienzo.start_y // (self.SIZE + 1)) - (self.lienzo.end_y // (self.SIZE + 1))) + 1
+        n = abs((self.lienzo.start_x // (self.SIZE)) - (self.lienzo.end_x // (self.SIZE))) + 1
+        m = abs((self.lienzo.start_y // (self.SIZE)) - (self.lienzo.end_y // (self.SIZE))) + 1
         self.x = 0
         self.y = 0
         if n >= m:
-            self.zoomed_SIZEx = 400 // n
-            self.zoomed_SIZEy = 400 // n
-            self.y = 200 - (self.zoomed_SIZEy * m)/2
+            self.zoomed_SIZEx = 430 // n
+            self.zoomed_SIZEy = 430 // n
+            self.y = 215 - (self.zoomed_SIZEy * m)/2
             
             
 
         else:
-            self.zoomed_SIZEx = 400 // m
-            self.zoomed_SIZEy = 400 // m
-            self.x = 200 - (self.zoomed_SIZEx * n)/2
+            self.zoomed_SIZEx = 430 // m
+            self.zoomed_SIZEy = 430 // m
+            self.x = 215 - (self.zoomed_SIZEx * n)/2
             
 
         initial_x = self.x
@@ -420,6 +443,7 @@ class editor:
         self.zoom = False
         self.matriz_zoomed = None
         self.zoom_button.config(text='Zoom In')
+        self.mostrar_botones()
         
         
 
@@ -481,7 +505,7 @@ class editor:
             x0, y0 = (self.lienzo.start_x, self.lienzo.start_y)
             x1, y1 = (event.x, event.y)
             self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
-            print(x0// (self.SIZE + 1) ,y0// (self.SIZE + 1) ,x1// (self.SIZE + 1) ,y1// (self.SIZE + 1))
+            print(x0// (self.SIZE) ,y0// (self.SIZE) ,x1// (self.SIZE) ,y1// (self.SIZE))
         
     def fin_zoom(self, event):
         if self.matriz_zoomed == None:
@@ -494,10 +518,10 @@ class editor:
         
     
     def zoom_in(self): #inicial donde se hace click y final donde se suelta
-        fila_inicial = self.lienzo.start_y // (self.SIZE + 1)
-        fila_final = self.lienzo.end_y // (self.SIZE + 1)
-        columna_inicial = self.lienzo.start_x // (self.SIZE + 1)
-        columna_final = self.lienzo.end_x // (self.SIZE + 1)
+        fila_inicial = self.lienzo.start_y // (self.SIZE)
+        fila_final = self.lienzo.end_y // (self.SIZE)
+        columna_inicial = self.lienzo.start_x // (self.SIZE)
+        columna_final = self.lienzo.end_x // (self.SIZE)
 
 
         matriz = self.matriz
