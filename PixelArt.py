@@ -47,7 +47,8 @@ class editor:
         self.isZoom = False
         self.isNum = False
         self.matriz_zoomed = None
-        self.zoomed_SIZE = None
+        self.zoomed_SIZEx = None
+        self.zoomed_SIZEy = None
 
     def get_creador(self):
         return self.creador
@@ -353,15 +354,30 @@ class editor:
 
     def mostrar_matriz_zoomed(self):
         self.hide_matriz()
-        self.y = 0
+
+        for i in range(self.cont):
+            self.lienzo.delete(f"zoomed_pixel{i}")
+
+
+        n = abs((self.lienzo.start_x // (self.SIZE + 1)) - (self.lienzo.end_x // (self.SIZE + 1))) + 1
+        m = abs((self.lienzo.start_y // (self.SIZE + 1)) - (self.lienzo.end_y // (self.SIZE + 1))) + 1
         self.x = 0
-        n = abs((self.lienzo.start_x // (self.SIZE + 1)) - (self.lienzo.end_x // (self.SIZE + 1))) + 2
-        m = abs((self.lienzo.start_y // (self.SIZE + 1)) - (self.lienzo.end_y // (self.SIZE + 1))) + 2
-        print("matriz{}x{}".format(n,m))
+        self.y = 0
         if n >= m:
-            self.zoomed_SIZE = 430 // n
+            self.zoomed_SIZEx = 400 // n
+            self.zoomed_SIZEy = 400 // n
+            self.y = 200 - (self.zoomed_SIZEy * m)/2
+            
+            
+
         else:
-            self.zoomed_SIZE = 430 // m
+            self.zoomed_SIZEx = 400 // m
+            self.zoomed_SIZEy = 400 // m
+            self.x = 200 - (self.zoomed_SIZEx * n)/2
+            
+
+        initial_x = self.x
+
 
         if self.isZoom:
 
@@ -387,11 +403,12 @@ class editor:
                         color =("brown")
                     elif num == 9:
                         color =("black")
-                    self.lienzo.create_rectangle(self.x, self.y, self.x + self.zoomed_SIZE, self.y + self.zoomed_SIZE, fill = color , tag = f"zoomed_pixel{self.cont}")
+                    self.lienzo.create_rectangle(self.x, self.y, self.x + self.zoomed_SIZEx, self.y + self.zoomed_SIZEy, fill = color , tag = f"zoomed_pixel{self.cont}")
                     self.cont+=1
-                    self.x += self.zoomed_SIZE + 1
-                self.x = 0
-                self.y+= self.zoomed_SIZE + 1
+                    self.x += self.zoomed_SIZEx + 1
+                
+                self.x = initial_x
+                self.y+= self.zoomed_SIZEy + 1
 
     def zoom_out(self):
         self.y = 0
@@ -400,6 +417,8 @@ class editor:
             self.lienzo.delete(f"zoomed_pixel{i}")
         self.mostrar_matriz()
         self.isZoom = False
+        self.zoom = False
+        self.matriz_zoomed = None
         self.zoom_button.config(text='Zoom In')
         
         
@@ -450,25 +469,28 @@ class editor:
             
 
     def inicio_zoom(self, event):
-        self.matriz_zoomed = None
-        self.lienzo.start_x = event.x
-        self.lienzo.start_y = event.y
+        if self.matriz_zoomed == None:
+            self.matriz_zoomed = None
+            self.lienzo.start_x = event.x
+            self.lienzo.start_y = event.y
         
     def select_zoom(self, event):
-        if self.lienzo.zoom:
-            self.lienzo.delete(self.lienzo.zoom)
-        x0, y0 = (self.lienzo.start_x, self.lienzo.start_y)
-        x1, y1 = (event.x, event.y)
-        self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
-        print(x0// (self.SIZE + 1) ,y0// (self.SIZE + 1) ,x1// (self.SIZE + 1) ,y1// (self.SIZE + 1))
+        if self.matriz_zoomed == None:
+            if self.lienzo.zoom:
+                self.lienzo.delete(self.lienzo.zoom)
+            x0, y0 = (self.lienzo.start_x, self.lienzo.start_y)
+            x1, y1 = (event.x, event.y)
+            self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
+            print(x0// (self.SIZE + 1) ,y0// (self.SIZE + 1) ,x1// (self.SIZE + 1) ,y1// (self.SIZE + 1))
         
     def fin_zoom(self, event):
-        self.lienzo.end_x = event.x
-        self.lienzo.end_y = event.y 
-        self.lienzo.delete(self.lienzo.zoom)
-        self.lienzo.zoom = None
-        self.zoom_button.config(text='Zoom Out')
-        self.zoom_in()
+        if self.matriz_zoomed == None:
+            self.lienzo.end_x = event.x
+            self.lienzo.end_y = event.y 
+            self.lienzo.delete(self.lienzo.zoom)
+            self.lienzo.zoom = None
+            self.zoom_button.config(text='Zoom Out')
+            self.zoom_in()
         
     
     def zoom_in(self): #inicial donde se hace click y final donde se suelta
