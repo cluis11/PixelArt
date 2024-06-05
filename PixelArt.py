@@ -46,6 +46,10 @@ class editor:
         self.lienzo.zoom = None
         self.isZoom = False
         self.isNum = False
+        self.isFill = False
+        self.color_to_paint = None
+        self.isCircle = None
+        self.radius = None
         self.matriz_zoomed = None
         self.zoomed_SIZEx = None
         self.zoomed_SIZEy = None
@@ -71,6 +75,19 @@ class editor:
     
     def get_isZoom(self):
         return self.isZoom
+    
+    def get_isFill(self):
+        return self.isFill
+    
+    def get_color_to_paint(self):
+        return self.color_to_paint
+
+    def get_isCircle(self):
+        return self.isCircle
+    
+    def get_radius(self):
+        return self.radius
+    
 
     def get_matriz_zoomed(self):
         return self.matriz_zoomed
@@ -98,7 +115,19 @@ class editor:
             self.isZoom = False
         else:
             self.isZoom = True
-            
+    
+    def set_isFill(self):
+        if self.isFill:
+            self.isFill = False
+        else:
+            self.isFill = True
+    
+    def set_isCircle(self):
+        if self.isCircle:
+            self.isCircle = False
+        else:
+            self.isCircle = True
+
     def set_isNum(self):
         if self.isNum():
             self.isNum = False
@@ -250,7 +279,7 @@ class editor:
         self.lienzo.bind("<Button-1>", self.on_canvas_click)
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
 
-        self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil",activebackground="lightgray")
         self.vertical.place(x=5, y=100)
 
         self.horizontal = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
@@ -267,6 +296,12 @@ class editor:
 
         self.contraste = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.contraste.place(x=175, y=525)
+
+        self.rellenar = Button(self.pantalla, width = 15, height = 2, text = 'Fill', command = self.Fill, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.rellenar.place(x=475, y=525)
+
+        self.circulo = Button(self.pantalla, width = 10, height = 2, text = 'Circle', command = self.circle3, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.circulo.place(x=550, y=15)
         
         self.negate = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.negate.place(x=620, y=425)
@@ -292,6 +327,8 @@ class editor:
         self.negate.place_forget()
         self.abrir_img.place_forget()
         self.guardar_img.place_forget()
+        self.circulo.place_forget()
+        self.rellenar.place_forget()
     
     def mostrar_botones(self):
         self.vertical.place(x=5, y=100)
@@ -303,6 +340,9 @@ class editor:
         self.negate.place(x=620, y=425)
         self.abrir_img.place(x=180, y=15)
         self.guardar_img.place(x=300, y=15)
+        self.circulo.place(x=550, y=15)
+        self.rellenar.place(x=475, y=525)
+        
         
     def asignar_color(self, event):
         color_id = event.widget.find_withtag(CURRENT)[0]
@@ -444,8 +484,73 @@ class editor:
         self.matriz_zoomed = None
         self.zoom_button.config(text='Zoom In')
         self.mostrar_botones()
-        
-        
+    
+
+
+    def rellenar_color(self, event):
+        x, y = event.x, event.y
+        m = x // (self.SIZE+1)
+        n = y // (self.SIZE+1)
+        matriz = self.matriz
+        color = self.get_color()
+        self.color_to_paint = matriz[n][m]
+        self.rellenar_color_aux(matriz, n, m, color)
+        self.actualiza_lienzo() 
+    
+    def rellenar_color_aux(self, matriz, n, m, color):
+        if 0 <= n < len(matriz) and 0 <= m < len(matriz[0]):
+            if matriz[n][m] == self.color_to_paint:
+                matriz[n][m] = color
+                if n + 1 < len(matriz) and matriz[n+1][m] == self.color_to_paint:
+                    self.rellenar_color_aux(matriz, n+1, m, color)
+                if n - 1 >= 0 and matriz[n-1][m] == self.color_to_paint:
+                    self.rellenar_color_aux(matriz, n-1, m, color)
+                if m + 1 < len(matriz[0]) and matriz[n][m+1] == self.color_to_paint:
+                    self.rellenar_color_aux(matriz, n, m+1, color)
+                if m - 1 >= 0 and matriz[n][m-1] == self.color_to_paint:
+                    self.rellenar_color_aux(matriz, n, m-1, color)
+    
+
+
+    def create_circle3(self,event):
+        x, y = event.x, event.y
+        n = x // (self.SIZE+1)
+        m = y // (self.SIZE+1)
+        c = self.get_color()
+        self.radius = 3
+        circle_matriz = [[0,0,c,c,c,0,0],
+                        [0,c,0,0,0,c,0],
+                        [c,0,0,0,0,0,c],
+                        [c,0,0,0,0,0,c], 
+                        [c,0,0,0,0,0,c],
+                        [0,c,0,0,0,c,0],
+                        [0,0,c,c,c,0,0]]
+        initial_x = m - 3
+        index_fila = 0
+        for fila in circle_matriz:
+            if initial_x < 0:
+                    index_fila +=1
+                    initial_x += 1
+            else:
+                index_columna = 0
+                initial_y = n - 3 
+                for columna in fila:
+                    if initial_y < 0:
+                            index_columna +=1
+                            initial_y += 1
+                    else:
+                        if circle_matriz[index_fila][index_columna] == c:
+                            self.matriz[initial_x][initial_y] = circle_matriz[index_fila][index_columna]
+                        index_columna +=1
+                        initial_y += 1
+                        if initial_y > 19:
+                            break
+                initial_x += 1
+                index_fila += 1
+                if initial_x > 19:
+                    break
+        self.actualiza_lienzo() 
+            
 
             
             
@@ -487,10 +592,41 @@ class editor:
             self.zoom_out()
         else:
             self.zoom = True
+            self.zoom_button.config(bg="lightgray")
             self.lienzo.bind("<Button-1>", self.inicio_zoom)
             self.lienzo.bind("<B1-Motion>", self.select_zoom)
             self.lienzo.bind("<ButtonRelease-1>", self.fin_zoom)
-            
+    
+    def Fill(self):
+        if self.isFill:
+            self.isFill = False
+            self.rellenar.config(bg = 'SystemButtonFace')
+            self.lienzo.bind("<Button-1>", self.on_canvas_click)
+            self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+            self.lienzo.unbind("<ButtonRelease-1>")
+
+        else:
+            self.isFill = True
+            self.rellenar.config(bg="lightgray")
+            self.lienzo.bind("<Button-1>", self.rellenar_color)
+            self.lienzo.unbind("<B1-Motion>")
+            self.lienzo.unbind("<ButtonRelease-1>")
+    
+    def circle3(self):
+        if self.isCircle:
+            self.isCircle = False
+            self.circulo.config(bg = 'SystemButtonFace')
+            self.lienzo.bind("<Button-1>", self.on_canvas_click)
+            self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+            self.lienzo.unbind("<ButtonRelease-1>")
+
+        else:
+            self.isCircle = True
+            self.circulo.config(bg="lightgray")
+            self.lienzo.bind("<Button-1>", self.create_circle3)
+            self.lienzo.unbind("<B1-Motion>")
+            self.lienzo.unbind("<ButtonRelease-1>")
+    
 
     def inicio_zoom(self, event):
         if self.matriz_zoomed == None:
@@ -514,6 +650,7 @@ class editor:
             self.lienzo.delete(self.lienzo.zoom)
             self.lienzo.zoom = None
             self.zoom_button.config(text='Zoom Out')
+            self.zoom_button.config(bg = 'SystemButtonFace')
             self.zoom_in()
         
     
