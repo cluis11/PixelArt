@@ -1,8 +1,10 @@
+
 from tkinter import *
 from tkinter import filedialog
 import json
 
 class editor:
+    #Funcion para inicializar los objetos, todos los atributos se asignan manualmente
     def __init__(self):
         self.matriz = [
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -26,37 +28,39 @@ class editor:
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                     ]
-        self.creador = "luis"
-        self.estado = "Creado"
-        self.color = 9
-        self.color_fill = "black"
-        self.SIZE = 20
-        self.x = 0
-        self.y = 0
-        self.cont = 1
-        self.cuadros_cambiados = set()
+        self.creador = "luis" #Dueño de la imagen
+        self.estado = "Creado" #Creado, Terminado, En Proceso
+        self.color = 9 #valor que indica que se va a guardar en la matriz
+        self.color_fill = "black" #Valor para poder pintar el rectangulo
+        self.SIZE = 20 #Tamaño de los rectangulos
+        self.x = 0 #coordenada x para dibujar en lienzo
+        self.y = 0 #coordenada x para dibujar en lienzo
+        self.cont = 1 #contador para asignar tag a los elementos del canvas
+        self.cuadros_cambiados = set() #lista que almacena los cuadros que se han pintado al arrastrar el mouse
+        #atributos de interfaz
+        self.window = Tk() 
+        self.pantalla = Canvas(self.window,width=800, height=600) #pantalla principal de la aplicacion
+        self.lienzo = Canvas(self.pantalla,width=430, height=430) #lienzo donde se dibuja
+        self.lienzo.start_x = None #posicion de inicio cuando se da click
+        self.lienzo.start_y = None #posicion de fin cuando se da click
+        self.lienzo.end_x = None #posicion de inicio cuando se suelta el click
+        self.lienzo.end_y = None #posicion de fin cuando se suelta el click
+        self.lienzo.zoom = None #
+        self.isZoom = False #bandera para determinar si el editor esta en modo zoom
+        self.isNum = False #bandera para determinar si el editor esta en modo mostrar numeros de la matriz
+        self.isFill = False #
+        self.color_to_paint = None #
+        self.isCircle = None #bandera para determinar si la opcion del circulo esta seleccionada
+        self.radius = None #radio del circulo
+        self.matriz_zoomed = None #Matriz del area seleccionada para el zoom
+        self.zoomed_SIZEx = None #
+        self.zoomed_SIZEy = None #
+        self.isAscii = False #bandera para determinar si el editor esta en modo mostrar ascii
+        self.islock = False
         
-        self.window = Tk()
-        self.pantalla = Canvas(self.window,width=800, height=600)
-        self.lienzo = Canvas(self.pantalla,width=430, height=430)
-        self.lienzo.start_x = None
-        self.lienzo.start_y = None
-        self.lienzo.end_x = None
-        self.lienzo.end_y = None
-        self.lienzo.zoom = None
-        self.isZoom = False
-        self.isNum = False
-        self.isFill = False
-        self.color_to_paint = None
-        self.isCircle = None
-        self.radius = None
-        self.matriz_zoomed = None
-        self.zoomed_SIZEx = None
-        self.zoomed_SIZEy = None
-
+#Funciones get de la clase
     def get_creador(self):
         return self.creador
-    
     
     def get_color(self):
         return self.color
@@ -69,6 +73,9 @@ class editor:
     
     def get_matriz(self):
         return self.matriz
+    
+    def get_cont(self):
+        return self.cont
     
     def get_isNum(self):
         return self.isNum
@@ -88,10 +95,10 @@ class editor:
     def get_radius(self):
         return self.radius
     
-
     def get_matriz_zoomed(self):
         return self.matriz_zoomed
     
+#Funciones set de la clase
     def set_creador(self, creador):
         self.creador = creador
     
@@ -109,6 +116,9 @@ class editor:
         
     def set_matriz_pos(self, i, j):
         self.matriz[i][j] = self.get_color()
+        
+    def set_cont(self, cont):
+        self.cont = cont
         
     def set_isZoom(self):
         if self.isZoom():
@@ -133,7 +143,8 @@ class editor:
             self.isNum = False
         else:
             self.isNum = True
-        
+      
+    #Funcion que actualiza los colores de los cuadros en lienzo a los valores mas recientes de la matriz  
     def actualiza_lienzo(self):
         cont = 1
         for fila in self.matriz:
@@ -143,6 +154,7 @@ class editor:
                 cont += 1
         self.actualiza_color(self.get_color())
     
+    #
     def reflejo_horizontal(self):
         nueva_matriz = []
         n = len(self.matriz[0])-1 #Tamaño de matriz (n+1)x(n+1)
@@ -158,13 +170,13 @@ class editor:
                 fila = fila + 1
         self.matriz = nueva_matriz
         self.actualiza_lienzo()
-        
+     
+     #   
     def reflejo_vertical(self):
         nueva_matriz = []
         n = len(self.matriz[0]) - 1  # Tamaño de matriz (n+1)x(n+1)
         for fila in range(n + 1):  # Crea (n+1) filas de la nueva matriz
             nueva_matriz.append([])
-
         for fila in range(n + 1):  # repite el ciclo por cada fila
             original = n
             for _ in range(n + 1):
@@ -173,6 +185,7 @@ class editor:
         self.matriz = nueva_matriz
         self.actualiza_lienzo()
     
+    #
     def rotar_derecha(self):
         nueva_matriz = []
         n = len(self.matriz[0])-1 #Tamaño de matriz (n+1)x(n+1)
@@ -181,12 +194,9 @@ class editor:
         for fila in nueva_matriz:
             for columna in range (n+1):
                 fila.append('')
-    
         columna_nueva_matriz = n
         for fila in self.matriz:
-            
             fila_nueva_matriz = 0
-            
             for elemento in fila:
                 nueva_matriz[fila_nueva_matriz][columna_nueva_matriz] = elemento
                 fila_nueva_matriz += 1
@@ -194,6 +204,7 @@ class editor:
         self.matriz = nueva_matriz
         self.actualiza_lienzo()
     
+    #
     def rotar_izquierda(self):
         nueva_matriz = []
         n = len(self.matriz[0])-1 #Tamaño de matriz (n+1)x(n+1)
@@ -202,12 +213,9 @@ class editor:
         for fila in nueva_matriz:
             for columna in range (n+1):
                 fila.append('')
-    
         columna_nueva_matriz = 0
         for fila in self.matriz:
-            
             fila_nueva_matriz = n
-            
             for elemento in fila:
                 nueva_matriz[fila_nueva_matriz][columna_nueva_matriz] = elemento
                 fila_nueva_matriz -= 1
@@ -215,6 +223,7 @@ class editor:
         self.matriz = nueva_matriz
         self.actualiza_lienzo()
 
+    #Funcion que convierte todos los valores de la matriz en 0 y actualiza el lienzo
     def clear_matriz(self):
         cleared_matriz = []
         n = (len(self.matriz))
@@ -225,6 +234,7 @@ class editor:
         self.matriz = cleared_matriz
         self.actualiza_lienzo()
         
+    #Funcion que invierte los valores de la matriz y actualiza el lienzo
     def negativo(self):
         valores_negativos = [9,8,7,6,5,4,3,2,1,0]
         n = (len(self.matriz))
@@ -233,6 +243,7 @@ class editor:
                 self.matriz[i][j] = valores_negativos[self.matriz[i][j]]
         self.actualiza_lienzo()  
     
+    #
     def alto_contraste(self):
         nueva_matriz = self.matriz
         index_fila = 0
@@ -248,6 +259,7 @@ class editor:
         self.matriz = nueva_matriz
         self.actualiza_lienzo()
    
+   #Funcion que se encarga de dibujar el lienzo en la interzas
     def dibujar_lienzo(self,matriz):
         for fila in matriz:
             for columna in fila:
@@ -258,9 +270,10 @@ class editor:
             self.x = 0
             self.y+= self.SIZE + 1
 
+    #Funcion que se encarga de crear la interfaz con todos sus elementos
     def mostrar_interfaz(self):
-        self.dibujar_lienzo(self.get_matriz())
-            
+        self.dibujar_lienzo(self.get_matriz()) #Dibuja el lienzo
+        #Dibuja los colores 
         self.pantalla.create_oval(620, 100, 620+50, 100+50, fill="white", tag="color")
         self.pantalla.create_oval(680, 100, 680+50, 100+50, fill="black", tag="color")
         self.pantalla.create_oval(620, 160, 620+50, 160+50, fill="pink", tag="color")
@@ -272,13 +285,15 @@ class editor:
         self.pantalla.create_oval(620, 340, 620+50, 340+50, fill="red", tag="color")
         self.pantalla.create_oval(680, 340, 680+50, 340+50, fill="green", tag="color")
         
-        self.pantalla.tag_bind("color", "<Button-1>", self.asignar_color)
+        self.pantalla.tag_bind("color", "<Button-1>", self.asignar_color) #permite cambiar de color al precionarlos
 
         self.pantalla.pack()
         self.lienzo.place(x=400,y=300, anchor="center")
+        #Bindings para dibujar
         self.lienzo.bind("<Button-1>", self.on_canvas_click)
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
 
+        #Botones para interactuar con la matriz y lienzo
         self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil",activebackground="lightgray")
         self.vertical.place(x=5, y=100)
 
@@ -315,8 +330,15 @@ class editor:
         self.zoom_button = Button(self.pantalla, width = 10, height = 2, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.zoom_button.place(x=30, y=15)
         
+        muestra_num = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Num', command = self.mostrar_matriz_num, relief="ridge", font = "Stencil", activebackground="lightgray")
+        muestra_num.place(x=620, y=470)
+        
+        muestra_acsii = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Acsii', command = self.mostrar_matriz_acsii, relief="ridge", font = "Stencil", activebackground="lightgray")
+        muestra_acsii.place(x=620, y=520)
+        
         self.window.mainloop()
     
+    #Funcion que oculta los botones al entrar en modo zoom
     def ocultar_botones(self):
         self.vertical.place_forget()
         self.horizontal.place_forget()
@@ -330,6 +352,7 @@ class editor:
         self.circulo.place_forget()
         self.rellenar.place_forget()
     
+    #Funcion que muestra los botones tras salir de modo zoom
     def mostrar_botones(self):
         self.vertical.place(x=5, y=100)
         self.horizontal.place(x=5, y=175)
@@ -343,7 +366,7 @@ class editor:
         self.circulo.place(x=550, y=15)
         self.rellenar.place(x=475, y=525)
         
-        
+    #Funcion que asigna el valor a guardar en la matriz y el color que corresponde a este al presionar un color en la interfaz
     def asignar_color(self, event):
         color_id = event.widget.find_withtag(CURRENT)[0]
         fill_color = event.widget.itemcget(color_id, "fill")
@@ -377,7 +400,8 @@ class editor:
         elif fill_color == "white":
             self.set_color(0)
             self.set_colorfill(fill_color)
-            
+    
+    #Funcion que permite recordar que color se tenia seleccionado tras actuaizar el lienzo
     def actualiza_color(self, num):
         if num == 0:
             self.set_colorfill("white")
@@ -400,9 +424,56 @@ class editor:
         elif num == 9:
             self.set_colorfill("black")
             
+    #Funcion que asigna todos los cuadros blancos y representa la matriz como un numero en el centro de cada cuadro
     def mostrar_matriz_num(self):
+        self.set_cont(1)
+        matriz = self.get_matriz()
         if self.isNum:
-            pass
+            self.isNum = False
+            for fila in matriz:
+                for columna in fila:
+                    self.lienzo.itemconfig(f"cuadro{self.cont}", text=f"", fill = "black")
+                    self.set_cont(self.get_cont()+1)
+            self.actualiza_lienzo()
+            self.islock=False
+            self.lienzo.bind("<Button-1>", self.on_canvas_click)
+            self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+        else:
+            self.islock=True
+            self.lienzo.unbind("<Button-1>")
+            self.lienzo.unbind("<B1-Motion>")
+            self.isNum = True
+            for fila in matriz:
+                for columna in fila:
+                    self.lienzo.itemconfig(f"pixel{self.cont}", fill = "white")
+                    self.lienzo.itemconfig(f"cuadro{self.cont}", text=f"{columna}", fill = "black")
+                    self.set_cont(self.get_cont()+1)
+            
+    #Funcion que asigna cada cuadro blanco y representa el valor de la matriz con su valor ascii        
+    def mostrar_matriz_acsii(self):
+        self.set_cont(1)
+        matriz = self.get_matriz()
+        if self.isAscii:
+            self.isAscii = False
+            for fila in matriz:
+                for columna in fila:
+                    self.lienzo.itemconfig(f"cuadro{self.cont}", text=f"", fill = "black")
+                    self.set_cont(self.get_cont()+1)
+            self.actualiza_lienzo()
+            self.islock=False
+            self.lienzo.bind("<Button-1>", self.on_canvas_click)
+            self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+        else:
+            self.islock=True
+            self.lienzo.unbind("<Button-1>")
+            self.lienzo.unbind("<B1-Motion>")
+            ascii_index = [' ','.',':','-','=','¡','&','$','%','@']
+            self.isAscii = True
+            for fila in matriz:
+                for columna in fila:
+                    self.lienzo.itemconfig(f"pixel{self.cont}", fill = "white")
+                    self.lienzo.itemconfig(f"cuadro{self.cont}", text=f"{ascii_index[columna]}", fill = "black")
+                    self.set_cont(self.get_cont()+1)
 
     def hide_matriz(self):
         for i in range(self.cont):
@@ -550,11 +621,9 @@ class editor:
                 if initial_x > 19:
                     break
         self.actualiza_lienzo() 
+                 
             
-
-            
-            
-        
+    #Funcion que pinta los cuadro cuando se le da click
     def on_canvas_click(self,event):
         self.cuadros_cambiados.clear()
         x, y = event.x, event.y
@@ -569,6 +638,7 @@ class editor:
             print (j, i)
             self.set_matriz_pos(i,j)            
 
+    #funcion que pinta los cuadros conforme el mouse se mueve mientras esta presionado
     def on_canvas_motion(self,event):
         x, y = event.x, event.y
         cuadro = self.lienzo.find_overlapping(x, y, x, y)
@@ -627,13 +697,14 @@ class editor:
             self.lienzo.unbind("<B1-Motion>")
             self.lienzo.unbind("<ButtonRelease-1>")
     
-
+    #funcion guarda las coordenadas al momento que se da click para seleccionar un area para el zoom
     def inicio_zoom(self, event):
         if self.matriz_zoomed == None:
             self.matriz_zoomed = None
             self.lienzo.start_x = event.x
             self.lienzo.start_y = event.y
-        
+    
+    #Funcion que actualiza el rectangulo que representa el area seleccionada para el zoom mientras se mueve el mouse presionado
     def select_zoom(self, event):
         if self.matriz_zoomed == None:
             if self.lienzo.zoom:
@@ -643,6 +714,7 @@ class editor:
             self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
             print(x0// (self.SIZE) ,y0// (self.SIZE) ,x1// (self.SIZE) ,y1// (self.SIZE))
         
+    #Funcion que guarda las coordenas cuando se suelta el click mientras se hacia zoom
     def fin_zoom(self, event):
         if self.matriz_zoomed == None:
             self.lienzo.end_x = event.x
@@ -743,7 +815,7 @@ class editor:
     
 
                 
-
+    #Funcion que permite abrir un archivo json de la aplicacion desde el explorador
     def abrir_json(self):
         filename = filedialog.askopenfilename(filetypes=[("Archivo JSON", "*.json")])
         if filename:
@@ -756,7 +828,8 @@ class editor:
                     self.actualiza_lienzo()
             except Exception as e:
                 print("Error al abrir el archivo:", e)
-                
+            
+    #Funcion que permite guardar la imagen en un archivo json    
     def guardar_json(self):
         filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("Archivo JSON", "*.json")])
         if filename:
