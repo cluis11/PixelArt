@@ -279,7 +279,7 @@ class editor:
         self.lienzo.bind("<Button-1>", self.on_canvas_click)
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
 
-        self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil",activebackground="lightgray")
         self.vertical.place(x=5, y=100)
 
         self.horizontal = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
@@ -300,8 +300,8 @@ class editor:
         self.rellenar = Button(self.pantalla, width = 15, height = 2, text = 'Fill', command = self.Fill, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.rellenar.place(x=475, y=525)
 
-        self.circle3 = Button(self.pantalla, width = 10, height = 2, text = 'Circle', command = self.circle3, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.circle3.place(x=550, y=15)
+        self.circulo = Button(self.pantalla, width = 10, height = 2, text = 'Circle', command = self.circle3, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.circulo.place(x=550, y=15)
         
         self.negate = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.negate.place(x=620, y=425)
@@ -327,6 +327,8 @@ class editor:
         self.negate.place_forget()
         self.abrir_img.place_forget()
         self.guardar_img.place_forget()
+        self.circulo.place_forget()
+        self.rellenar.place_forget()
     
     def mostrar_botones(self):
         self.vertical.place(x=5, y=100)
@@ -338,6 +340,9 @@ class editor:
         self.negate.place(x=620, y=425)
         self.abrir_img.place(x=180, y=15)
         self.guardar_img.place(x=300, y=15)
+        self.circulo.place(x=550, y=15)
+        self.rellenar.place(x=475, y=525)
+        
         
     def asignar_color(self, event):
         color_id = event.widget.find_withtag(CURRENT)[0]
@@ -587,6 +592,7 @@ class editor:
             self.zoom_out()
         else:
             self.zoom = True
+            self.zoom_button.config(bg="lightgray")
             self.lienzo.bind("<Button-1>", self.inicio_zoom)
             self.lienzo.bind("<B1-Motion>", self.select_zoom)
             self.lienzo.bind("<ButtonRelease-1>", self.fin_zoom)
@@ -594,12 +600,14 @@ class editor:
     def Fill(self):
         if self.isFill:
             self.isFill = False
+            self.rellenar.config(bg = 'SystemButtonFace')
             self.lienzo.bind("<Button-1>", self.on_canvas_click)
             self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
             self.lienzo.unbind("<ButtonRelease-1>")
 
         else:
             self.isFill = True
+            self.rellenar.config(bg="lightgray")
             self.lienzo.bind("<Button-1>", self.rellenar_color)
             self.lienzo.unbind("<B1-Motion>")
             self.lienzo.unbind("<ButtonRelease-1>")
@@ -607,12 +615,14 @@ class editor:
     def circle3(self):
         if self.isCircle:
             self.isCircle = False
+            self.circulo.config(bg = 'SystemButtonFace')
             self.lienzo.bind("<Button-1>", self.on_canvas_click)
             self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
             self.lienzo.unbind("<ButtonRelease-1>")
 
         else:
             self.isCircle = True
+            self.circulo.config(bg="lightgray")
             self.lienzo.bind("<Button-1>", self.create_circle3)
             self.lienzo.unbind("<B1-Motion>")
             self.lienzo.unbind("<ButtonRelease-1>")
@@ -640,6 +650,7 @@ class editor:
             self.lienzo.delete(self.lienzo.zoom)
             self.lienzo.zoom = None
             self.zoom_button.config(text='Zoom Out')
+            self.zoom_button.config(bg = 'SystemButtonFace')
             self.zoom_in()
         
     
