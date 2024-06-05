@@ -52,6 +52,7 @@ class editor:
         self.color_to_paint = None #
         self.isCircle = None #bandera para determinar si la opcion del circulo esta seleccionada
         self.radius = None #radio del circulo
+        self.isSquare = None 
         self.matriz_zoomed = None #Matriz del area seleccionada para el zoom
         self.zoomed_SIZEx = None #
         self.zoomed_SIZEy = None #
@@ -95,6 +96,9 @@ class editor:
     def get_radius(self):
         return self.radius
     
+    def get_isSquare(self):
+        return self.isSquare
+
     def get_matriz_zoomed(self):
         return self.matriz_zoomed
     
@@ -137,6 +141,12 @@ class editor:
             self.isCircle = False
         else:
             self.isCircle = True
+    
+    def set_isSquare(self):
+        if self.isSquare:
+            self.isSquare = False
+        else:
+            self.isSquare = True
 
     def set_isNum(self):
         if self.isNum():
@@ -310,16 +320,19 @@ class editor:
         self.clear_all.place(x=5, y=400)
 
         self.contraste = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.contraste.place(x=175, y=525)
+        self.contraste.place(x=5, y=525)
 
         self.rellenar = Button(self.pantalla, width = 15, height = 2, text = 'Fill', command = self.Fill, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.rellenar.place(x=475, y=525)
+        self.rellenar.place(x=620, y=425)
 
-        self.circulo = Button(self.pantalla, width = 10, height = 2, text = 'Circle', command = self.circle3, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.circulo.place(x=550, y=15)
+        self.circulo = Button(self.pantalla, width = 10, height = 2, text = 'Circle', command = self.circle, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.circulo.place(x=525, y=15)
+
+        self.cuadrado = Button(self.pantalla, width = 10, height = 2, text = 'Square', command = self.square, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.cuadrado.place(x=650, y=15)
         
         self.negate = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.negate.place(x=620, y=425)
+        self.negate.place(x=620, y=525)
         
         self.abrir_img = Button(self.pantalla, width = 10, height = 2, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.abrir_img.place(x=180, y=15)
@@ -330,11 +343,11 @@ class editor:
         self.zoom_button = Button(self.pantalla, width = 10, height = 2, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.zoom_button.place(x=30, y=15)
         
-        muestra_num = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Num', command = self.mostrar_matriz_num, relief="ridge", font = "Stencil", activebackground="lightgray")
-        muestra_num.place(x=620, y=470)
+        self.muestra_num = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Num', command = self.mostrar_matriz_num, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.muestra_num.place(x=215, y=525)
         
-        muestra_acsii = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Acsii', command = self.mostrar_matriz_acsii, relief="ridge", font = "Stencil", activebackground="lightgray")
-        muestra_acsii.place(x=620, y=520)
+        self.muestra_acsii = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Acsii', command = self.mostrar_matriz_acsii, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.muestra_acsii.place(x=400, y=525)
         
         self.window.mainloop()
     
@@ -351,6 +364,8 @@ class editor:
         self.guardar_img.place_forget()
         self.circulo.place_forget()
         self.rellenar.place_forget()
+        self.muestra_acsii.place_forget()
+        self.muestra_num.place_forget()
     
     #Funcion que muestra los botones tras salir de modo zoom
     def mostrar_botones(self):
@@ -360,11 +375,13 @@ class editor:
         self.izquierda.place(x=5, y=325)
         self.clear_all.place(x=5, y=400)
         self.contraste.place(x=175, y=525)
-        self.negate.place(x=620, y=425)
+        self.negate.place(x=620, y=525)
         self.abrir_img.place(x=180, y=15)
         self.guardar_img.place(x=300, y=15)
         self.circulo.place(x=550, y=15)
-        self.rellenar.place(x=475, y=525)
+        self.rellenar.place(x=620, y=425)
+        self.muestra_num.place(x=215, y=525)
+        self.muestra_acsii.place(x=400, y=525)
         
     #Funcion que asigna el valor a guardar en la matriz y el color que corresponde a este al presionar un color en la interfaz
     def asignar_color(self, event):
@@ -565,7 +582,8 @@ class editor:
         matriz = self.matriz
         color = self.get_color()
         self.color_to_paint = matriz[n][m]
-        self.rellenar_color_aux(matriz, n, m, color)
+        if color != self.color_to_paint:
+            self.rellenar_color_aux(matriz, n, m, color)
         self.actualiza_lienzo() 
     
     def rellenar_color_aux(self, matriz, n, m, color):
@@ -589,13 +607,13 @@ class editor:
         m = y // (self.SIZE+1)
         c = self.get_color()
         self.radius = 3
-        circle_matriz = [[0,0,c,c,c,0,0],
-                        [0,c,0,0,0,c,0],
-                        [c,0,0,0,0,0,c],
-                        [c,0,0,0,0,0,c], 
-                        [c,0,0,0,0,0,c],
-                        [0,c,0,0,0,c,0],
-                        [0,0,c,c,c,0,0]]
+        circle_matriz = [['x','x',c,c,c,'x','x'],
+                        ['x',c,'x','x','x',c,'x'],
+                        [c,'x','x','x','x','x',c],
+                        [c,'x','x','x','x','x',c],
+                        [c,'x','x','x','x','x',c],
+                        ['x',c,'x','x','x',c,'x'],
+                        ['x','x',c,c,c,'x','x'] ]
         initial_x = m - 3
         index_fila = 0
         for fila in circle_matriz:
@@ -612,6 +630,43 @@ class editor:
                     else:
                         if circle_matriz[index_fila][index_columna] == c:
                             self.matriz[initial_x][initial_y] = circle_matriz[index_fila][index_columna]
+                        index_columna +=1
+                        initial_y += 1
+                        if initial_y > 19:
+                            break
+                initial_x += 1
+                index_fila += 1
+                if initial_x > 19:
+                    break
+        self.actualiza_lienzo() 
+
+    
+    def create_square(self,event):
+        x, y = event.x, event.y
+        n = x // (self.SIZE+1)
+        m = y // (self.SIZE+1)
+        c = self.get_color()
+        square_matriz = [['x',c,c,c,c,c,'x'],
+                        ['x',c,'x','x','x',c,'x'],
+                        ['x',c,'x','x','x',c,'x'],
+                        ['x',c,'x','x','x',c,'x'],
+                        ['x',c,c,c,c,c,'x'] ]
+        initial_x = m - 2
+        index_fila = 0
+        for fila in square_matriz:
+            if initial_x < 0:
+                    index_fila +=1
+                    initial_x += 1
+            else:
+                index_columna = 0
+                initial_y = n - 3
+                for columna in fila:
+                    if initial_y < 0:
+                            index_columna +=1
+                            initial_y += 1
+                    else:
+                        if square_matriz[index_fila][index_columna] == c:
+                            self.matriz[initial_x][initial_y] = square_matriz[index_fila][index_columna]
                         index_columna +=1
                         initial_y += 1
                         if initial_y > 19:
@@ -682,7 +737,7 @@ class editor:
             self.lienzo.unbind("<B1-Motion>")
             self.lienzo.unbind("<ButtonRelease-1>")
     
-    def circle3(self):
+    def circle(self):
         if self.isCircle:
             self.isCircle = False
             self.circulo.config(bg = 'SystemButtonFace')
@@ -696,6 +751,23 @@ class editor:
             self.lienzo.bind("<Button-1>", self.create_circle3)
             self.lienzo.unbind("<B1-Motion>")
             self.lienzo.unbind("<ButtonRelease-1>")
+    
+    def square(self):
+        if self.isSquare:
+            self.isSquare = False
+            self.cuadrado.config(bg = 'SystemButtonFace')
+            self.lienzo.bind("<Button-1>", self.on_canvas_click)
+            self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+            self.lienzo.unbind("<ButtonRelease-1>")
+
+        else:
+            self.isSquare = True
+            self.cuadrado.config(bg="lightgray")
+            self.lienzo.bind("<Button-1>", self.create_square)
+            self.lienzo.unbind("<B1-Motion>")
+            self.lienzo.unbind("<ButtonRelease-1>")
+    
+
     
     #funcion guarda las coordenadas al momento que se da click para seleccionar un area para el zoom
     def inicio_zoom(self, event):
@@ -727,10 +799,10 @@ class editor:
         
     
     def zoom_in(self): #inicial donde se hace click y final donde se suelta
-        fila_inicial = self.lienzo.start_y // (self.SIZE)
-        fila_final = self.lienzo.end_y // (self.SIZE)
-        columna_inicial = self.lienzo.start_x // (self.SIZE)
-        columna_final = self.lienzo.end_x // (self.SIZE)
+        fila_inicial = self.lienzo.start_y // (self.SIZE+1)
+        fila_final = self.lienzo.end_y // (self.SIZE+1)
+        columna_inicial = self.lienzo.start_x // (self.SIZE+1)
+        columna_final = self.lienzo.end_x // (self.SIZE+1)
 
         if fila_inicial > 19:
             fila_inicial = 19
