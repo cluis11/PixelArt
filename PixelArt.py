@@ -304,49 +304,49 @@ class editor:
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
 
         #Botones para interactuar con la matriz y lienzo
-        self.vertical = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil",activebackground="lightgray")
+        self.vertical = Button(self.pantalla, width = 15, height = 1, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil",activebackground="lightgray")
         self.vertical.place(x=5, y=100)
 
-        self.horizontal = Button(self.pantalla, width = 15, height = 2, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.horizontal = Button(self.pantalla, width = 15, height = 1, text = 'Reflex Horizontal', command = self.reflejo_horizontal, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.horizontal.place(x=5, y=175)
 
-        self.derecha = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Right', command = self.rotar_derecha, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.derecha = Button(self.pantalla, width = 15, height = 1, text = 'Rotate Right', command = self.rotar_derecha, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.derecha.place(x=5, y=250)
 
-        self.izquierda = Button(self.pantalla, width = 15, height = 2, text = 'Rotate Left', command = self.rotar_izquierda, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.izquierda = Button(self.pantalla, width = 15, height = 1, text = 'Rotate Left', command = self.rotar_izquierda, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.izquierda.place(x=5, y=325)
 
-        self.clear_all = Button(self.pantalla, width = 15, height = 2, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.clear_all = Button(self.pantalla, width = 15, height = 1, text = 'Clear All', command = self.clear_matriz, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.clear_all.place(x=5, y=400)
 
-        self.contraste = Button(self.pantalla, width = 15, height = 2, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.contraste = Button(self.pantalla, width = 15, height = 1, text = 'High Contrast', command = self.alto_contraste, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.contraste.place(x=5, y=525)
 
-        self.rellenar = Button(self.pantalla, width = 15, height = 2, text = 'Fill', command = self.Fill, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.rellenar = Button(self.pantalla, width = 10, height = 1, text = 'Fill', command = self.Fill, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.rellenar.place(x=620, y=425)
 
-        self.circulo = Button(self.pantalla, width = 10, height = 2, text = 'Circle', command = self.circle, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.circulo.place(x=525, y=15)
+        self.circulo = Button(self.pantalla, width = 10, height = 1, text = 'Circle', command = self.circle, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.circulo.place(x=620, y=475)
 
-        self.cuadrado = Button(self.pantalla, width = 10, height = 2, text = 'Square', command = self.square, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.cuadrado.place(x=650, y=15)
+        self.cuadrado = Button(self.pantalla, width = 10, height = 1, text = 'Square', command = self.square, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.cuadrado.place(x=620, y=525)
         
-        self.negate = Button(self.pantalla, width = 15, height = 2, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.negate.place(x=620, y=525)
+        self.negate = Button(self.pantalla, width = 15, height = 1, text = 'Negativo', command = self.negativo, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.negate.place(x=5, y=460)
         
-        self.abrir_img = Button(self.pantalla, width = 10, height = 2, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.abrir_img = Button(self.pantalla, width = 7, height = 1, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.abrir_img.place(x=180, y=15)
         
-        self.guardar_img = Button(self.pantalla, width = 10, height = 2, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.guardar_img = Button(self.pantalla, width = 7, height = 1, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.guardar_img.place(x=300, y=15)
         
-        self.zoom_button = Button(self.pantalla, width = 10, height = 2, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.zoom_button = Button(self.pantalla, width = 10, height = 1, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.zoom_button.place(x=30, y=15)
         
-        self.muestra_num = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Num', command = self.mostrar_matriz_num, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.muestra_num = Button(self.pantalla, width = 15, height = 1, text = 'Mostrar Num', command = self.mostrar_matriz_num, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.muestra_num.place(x=215, y=525)
         
-        self.muestra_acsii = Button(self.pantalla, width = 15, height = 2, text = 'Mostrar Acsii', command = self.mostrar_matriz_acsii, relief="ridge", font = "Stencil", activebackground="lightgray")
+        self.muestra_acsii = Button(self.pantalla, width = 15, height = 1, text = 'Mostrar Acsii', command = self.mostrar_matriz_acsii, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.muestra_acsii.place(x=400, y=525)
         
         self.window.mainloop()
@@ -363,6 +363,7 @@ class editor:
         self.abrir_img.place_forget()
         self.guardar_img.place_forget()
         self.circulo.place_forget()
+        self.cuadrado.place_forget()
         self.rellenar.place_forget()
         self.muestra_acsii.place_forget()
         self.muestra_num.place_forget()
@@ -374,11 +375,12 @@ class editor:
         self.derecha.place(x=5, y=250)
         self.izquierda.place(x=5, y=325)
         self.clear_all.place(x=5, y=400)
-        self.contraste.place(x=175, y=525)
+        self.contraste.place(x=5, y=525)
         self.negate.place(x=620, y=525)
         self.abrir_img.place(x=180, y=15)
         self.guardar_img.place(x=300, y=15)
         self.circulo.place(x=550, y=15)
+        self.cuadrado.place(x=650, y=15)
         self.rellenar.place(x=620, y=425)
         self.muestra_num.place(x=215, y=525)
         self.muestra_acsii.place(x=400, y=525)
@@ -573,8 +575,6 @@ class editor:
         self.zoom_button.config(text='Zoom In')
         self.mostrar_botones()
     
-
-
     def rellenar_color(self, event):
         x, y = event.x, event.y
         m = x // (self.SIZE+1)
