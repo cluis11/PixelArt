@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import filedialog
 import json
+from tkinter import messagebox
 
 class editor:
     #Funcion para inicializar los objetos, todos los atributos se asignan manualmente
@@ -28,7 +29,7 @@ class editor:
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                     ]
-        self.creador = "luis" #Dueño de la imagen
+        self.creador = "" #Dueño de la imagen
         self.estado = "Creado" #Creado, Terminado, En Proceso
         self.color = 9 #valor que indica que se va a guardar en la matriz
         self.color_fill = "black" #Valor para poder pintar el rectangulo
@@ -58,6 +59,10 @@ class editor:
         self.zoomed_SIZEy = None #
         self.isAscii = False #bandera para determinar si el editor esta en modo mostrar ascii
         self.islock = False
+        self.estados = ["Creado","En Proceso","Completado"]
+        self.pantalla.creadortxt = NONE
+        self.pantalla.estadoimg = NONE
+        self.pantalla.variable = NONE
         
 #Funciones get de la clase
     def get_creador(self):
@@ -101,6 +106,9 @@ class editor:
 
     def get_matriz_zoomed(self):
         return self.matriz_zoomed
+    
+    def get_estados(self):
+        return self.estados
     
 #Funciones set de la clase
     def set_creador(self, creador):
@@ -302,6 +310,18 @@ class editor:
         #Bindings para dibujar
         self.lienzo.bind("<Button-1>", self.on_canvas_click)
         self.lienzo.bind("<B1-Motion>", self.on_canvas_motion)
+        
+        #estado y creador
+        options = self.get_estados()
+        self.pantalla.variable = StringVar(self.pantalla)
+        self.pantalla.variable.set(options[0])  
+        self.pantalla.estadoimg = OptionMenu(self.pantalla, self.pantalla.variable, *options)
+        self.pantalla.estadoimg.place(x=350, y=35)
+        self.pantalla.create_text(310, 55, text="Estado", font = ("Stencil", 12))
+        
+        self.pantalla.create_text(310, 20, text="Creador", font = ("Stencil", 12))
+        self.pantalla.creadortxt = Entry(self.pantalla, width=25)
+        self.pantalla.creadortxt.place(x=350, y = 10)
 
         #Botones para interactuar con la matriz y lienzo
         self.vertical = Button(self.pantalla, width = 15, height = 1, text = 'Reflex Vertical', command = self.reflejo_vertical, relief="ridge", font = "Stencil",activebackground="lightgray")
@@ -335,10 +355,10 @@ class editor:
         self.negate.place(x=5, y=460)
         
         self.abrir_img = Button(self.pantalla, width = 7, height = 1, text = 'Abrir', command = self.abrir_json, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.abrir_img.place(x=180, y=15)
+        self.abrir_img.place(x=620, y=15)
         
         self.guardar_img = Button(self.pantalla, width = 7, height = 1, text = 'Guardar', command = self.guardar_json, relief="ridge", font = "Stencil", activebackground="lightgray")
-        self.guardar_img.place(x=300, y=15)
+        self.guardar_img.place(x=710, y=15)
         
         self.zoom_button = Button(self.pantalla, width = 10, height = 1, text = 'Zoom In', command = self.zoom, relief="ridge", font = "Stencil", activebackground="lightgray")
         self.zoom_button.place(x=30, y=15)
@@ -688,9 +708,6 @@ class editor:
             self.cuadros_cambiados.add(cuadro)
             j = x // (self.SIZE + 1)
             i = y // (self.SIZE + 1)
-            print("\n")
-            print(x, y)
-            print (j, i)
             self.set_matriz_pos(i,j)            
 
     #funcion que pinta los cuadros conforme el mouse se mueve mientras esta presionado
@@ -703,9 +720,9 @@ class editor:
                 self.cuadros_cambiados.add(item)
                 j = x // (self.SIZE + 1)
                 i = y // (self.SIZE + 1)
-                print("\n")
-                print(x, y)
-                print (j, i)
+                #print("\n")
+                #print(x, y)
+                #print (j, i)
                 self.matriz[i][j] = self.get_color()
                 
     def zoom(self):
@@ -784,7 +801,7 @@ class editor:
             x0, y0 = (self.lienzo.start_x, self.lienzo.start_y)
             x1, y1 = (event.x, event.y)
             self.lienzo.zoom = self.lienzo.create_rectangle(x0, y0, x1, y1, outline="black", width=3)
-            print(x0// (self.SIZE) ,y0// (self.SIZE) ,x1// (self.SIZE) ,y1// (self.SIZE))
+            #print(x0// (self.SIZE) ,y0// (self.SIZE) ,x1// (self.SIZE) ,y1// (self.SIZE))
         
     #Funcion que guarda las coordenas cuando se suelta el click mientras se hacia zoom
     def fin_zoom(self, event):
@@ -827,7 +844,7 @@ class editor:
         filas_nueva_matriz = abs(fila_inicial-fila_final) + 1
         columnas_nueva_matriz = abs(columna_inicial - columna_final) + 1
 
-        print('size nueva matriz es {}x{}'.format(filas_nueva_matriz,columnas_nueva_matriz))
+        #print('size nueva matriz es {}x{}'.format(filas_nueva_matriz,columnas_nueva_matriz))
         
         nueva_matriz = []
 
@@ -878,8 +895,8 @@ class editor:
         self.isZoom = True
         self.mostrar_matriz_zoomed()
         
-        print("MATRIZ CLEARED:")
-        print()
+        #print("MATRIZ CLEARED:")
+        #print()
         for fila in self.matriz_zoomed:
             for columna in fila:
                 print(' {} '.format(columna),end='')
@@ -898,24 +915,33 @@ class editor:
                     self.set_estado(data.get('estado'))
                     self.set_matriz(data.get('matriz'))
                     self.actualiza_lienzo()
+                    self.pantalla.creadortxt.delete(0, END)
+                    self.pantalla.creadortxt.insert(0, self.get_creador())
+                    self.pantalla.varible.set(self.get_estado())
             except Exception as e:
                 print("Error al abrir el archivo:", e)
             
     #Funcion que permite guardar la imagen en un archivo json    
     def guardar_json(self):
-        filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("Archivo JSON", "*.json")])
-        if filename:
-            data = {
-                'dueno': self.get_creador(),
-                'estado': self.get_estado(),
-                'matriz': self.get_matriz()
-            }
-            try:
-                with open(filename, 'w') as file:
-                    json.dump(data, file, indent=4)
-                    print("Archivo JSON guardado correctamente:", filename)
-            except Exception as e:
-                print("Error al guardar el archivo JSON:", e)
+        if self.pantalla.creadortxt.get() == "":
+            messagebox.showinfo("Alert", "Ingrese el nombre del creador")
+        else:
+            self.set_creador(self.pantalla.creadortxt.get())
+            self.set_estado(self.pantalla.variable.get())
+            filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("Archivo JSON", "*.json")])
+            if filename:
+                data = {
+                    'dueno': self.get_creador(),
+                    'estado': self.get_estado(),
+                    'matriz': self.get_matriz()
+                }
+                try:
+                    with open(filename, 'w') as file:
+                        json.dump(data, file, indent=4)
+                        print("Archivo JSON guardado correctamente:", filename)
+                        messagebox.showinfo("Exito", "Archivo a sido guardado")
+                except Exception as e:
+                    print("Error al guardar el archivo JSON:", e)
 
 objeto = editor()
 objeto.mostrar_interfaz()
